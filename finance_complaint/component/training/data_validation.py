@@ -45,21 +45,21 @@ class DataValidation(FinanceDataSchema):
             )
             logger.info(f"Data frame is created using file: {self.data_ingestion_artifact.feature_store_file_path}")
             logger.info(f"Number of row: {dataframe.count()} and column: {len(dataframe.columns)}")
-            dataframe, _ = dataframe.randomSplit([0.01, 0.99])
+            dataframe, _ = dataframe.randomSplit([0.01, 0.99]) ## to run inside the neuro-lab we have taken only 1% of data as it cannot load all data
             return dataframe
         except Exception as e:
             raise FinanceException(e, sys)
 
     @staticmethod
-    def get_missing_report(dataframe: DataFrame, ) -> Dict[str, MissingReport]:
+    def get_missing_report(dataframe: DataFrame, ) -> Dict[str, MissingReport]: ##generating the missing report
         try:
             missing_report: Dict[str:MissingReport] = dict()
             logger.info(f"Preparing missing reports for each column")
             number_of_row = dataframe.count()
 
             for column in dataframe.columns:
-                missing_row = dataframe.filter(f"{column} is null").count()
-                missing_percentage = (missing_row * 100) / number_of_row
+                missing_row = dataframe.filter(f"{column} is null").count() ## filtering the null rows
+                missing_percentage = (missing_row * 100) / number_of_row   ## the null row percentage
                 missing_report[column] = MissingReport(total_row=number_of_row,
                                                        missing_row=missing_row,
                                                        missing_percentage=missing_percentage
@@ -71,13 +71,16 @@ class DataValidation(FinanceDataSchema):
             raise FinanceException(e, sys)
 
     def get_unwanted_and_high_missing_value_columns(self, dataframe: DataFrame, threshold: float = 0.3) -> List[str]:
+        """
+        Here we have the unwanted_and_high_missing_value_columns where missing values are more than 30%
+        """
         try:
-            missing_report: Dict[str, MissingReport] = self.get_missing_report(dataframe=dataframe)
+            missing_report: Dict[str, MissingReport] = self.get_missing_report(dataframe=dataframe) 
 
-            unwanted_column: List[str] = self.schema.unwanted_columns
+            unwanted_column: List[str] = self.schema.unwanted_columns ## in schema we already have the kept the unwanted columns after EDA
             for column in missing_report:
-                if missing_report[column].missing_percentage > (threshold * 100):
-                    unwanted_column.append(column)
+                if missing_report[column].missing_percentage > (threshold * 100): ## if the missing % > 30
+                    unwanted_column.append(column)    ## appending the unwanted columns to the unwanted_column list
                     logger.info(f"Missing report {column}: [{missing_report[column]}]")
             unwanted_column = list(set(unwanted_column))
             return unwanted_column
@@ -87,18 +90,18 @@ class DataValidation(FinanceDataSchema):
 
     def drop_unwanted_columns(self, dataframe: DataFrame) -> DataFrame:
         try:
-            unwanted_columns: List = self.get_unwanted_and_high_missing_value_columns(dataframe=dataframe, )
+            unwanted_columns: List = self.get_unwanted_and_high_missing_value_columns(dataframe=dataframe, ) #unwanted_columns list we will prepare from get_unwanted_and_high_missing_value_columns
             logger.info(f"Dropping feature: {','.join(unwanted_columns)}")
-            unwanted_dataframe: DataFrame = dataframe.select(unwanted_columns)
+            unwanted_dataframe: DataFrame = dataframe.select(unwanted_columns)  ## selecting the unwanted column from the dataframe
 
-            unwanted_dataframe = unwanted_dataframe.withColumn(ERROR_MESSAGE, lit("Contains many missing values"))
+            unwanted_dataframe = unwanted_dataframe.withColumn(ERROR_MESSAGE, lit("Contains many missing values")) ## error message for the unwanted columns
 
-            rejected_dir = os.path.join(self.data_validation_config.rejected_data_dir, "missing_data")
+            rejected_dir = os.path.join(self.data_validation_config.rejected_data_dir, "missing_data")  ## we will write the data in rejected data dir in the data validation artifact
             os.makedirs(rejected_dir, exist_ok=True)
             file_path = os.path.join(rejected_dir, self.data_validation_config.file_name)
 
-            logger.info(f"Writing dropped column into file: [{file_path}]")
-            unwanted_dataframe.write.mode("append").parquet(file_path)
+            logger.info(f"Writing dropped column into file: [{file_path}]") 
+            unwanted_dataframe.write.mode("append").parquet(file_path) 
             dataframe: DataFrame = dataframe.drop(*unwanted_columns)
             logger.info(f"Remaining number of columns: [{dataframe.columns}]")
             return dataframe
@@ -106,7 +109,7 @@ class DataValidation(FinanceDataSchema):
             raise FinanceException(e, sys)
 
     @staticmethod
-    def get_unique_values_of_each_column(dataframe: DataFrame) -> None:
+    def get_unique_values_of_each_column(dataframe: DataFrame) -> None:  ## unique values of each columns
         try:
             for column in dataframe.columns:
                 n_unique: int = dataframe.select(col(column)).distinct().count()

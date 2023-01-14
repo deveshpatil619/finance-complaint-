@@ -10,6 +10,8 @@ from typing import Dict
 class FinanceDataSchema:
 
     def __init__(self):
+        """ Here we have attribute for each and every columns"""
+
         self.col_company_response: str = 'company_response'
         self.col_consumer_consent_provided: str = 'consumer_consent_provided'
         self.col_submitted_via = 'submitted_via'
@@ -30,6 +32,7 @@ class FinanceDataSchema:
 
     @property
     def dataframe_schema(self) -> StructType:
+        """ In pyspark defining the schema for dataframe"""
         try:
             schema = StructType([
                 StructField(self.col_company_response, StringType()),
@@ -52,11 +55,11 @@ class FinanceDataSchema:
             raise FinanceException(e, sys) from e
 
     @property
-    def target_column(self) -> str:
-        return self.col_consumer_disputed
+    def target_column(self) -> str:  
+        return self.col_consumer_disputed  ## setting the target column_name
 
     @property
-    def one_hot_encoding_features(self) -> List[str]:
+    def one_hot_encoding_features(self) -> List[str]:  ## columns where we need to use the one-hot encoding features
         features = [
             self.col_company_response,
             self.col_consumer_consent_provided,
@@ -65,7 +68,7 @@ class FinanceDataSchema:
         return features
 
     @property
-    def im_one_hot_encoding_features(self) -> List[str]:
+    def im_one_hot_encoding_features(self) -> List[str]:  
         return [f"im_{col}" for col in self.one_hot_encoding_features]
 
     @property
@@ -79,24 +82,24 @@ class FinanceDataSchema:
     @property
     def tfidf_features(self) -> List[str]:
         features = [
-            self.col_issue
+            self.col_issue  ## we will claculate the tfidf for issue column
         ]
         return features
 
     @property
-    def derived_input_features(self) -> List[str]:
+    def derived_input_features(self) -> List[str]:  ## 
         features = [
-            self.col_date_sent_to_company,
+            self.col_date_sent_to_company,  
             self.col_date_received
         ]
         return features
 
     @property
     def derived_output_features(self) -> List[str]:
-        return [self.col_diff_in_days]
+        return [self.col_diff_in_days]    ## col_date_received - col_date_sent_to_company we get the col_diff_in_days
 
     @property
-    def numerical_columns(self) -> List[str]:
+    def numerical_columns(self) -> List[str]: 
         return self.derived_output_features
 
     @property
