@@ -41,6 +41,7 @@ class DataTransformation():
 
     def get_data_transformation_pipeline(self, ) -> Pipeline:
         try:
+            """ Here all the steps of the data-transformation stage will be defined"""
 
             stages = [
 
@@ -51,25 +52,30 @@ class DataTransformation():
             # generating additional columns
             derived_feature = DerivedFeatureGenerator(inputCols=self.schema.derived_input_features,
                                                       outputCols=self.schema.derived_output_features)
-            stages.append(derived_feature)
-            # creating imputer to fill null values
-            imputer = Imputer(inputCols=self.schema.numerical_columns,
-                              outputCols=self.schema.im_numerical_columns)
-            stages.append(imputer)
+            stages.append(derived_feature) ## appending the derived_features to the list
 
+            # creating imputer to fill null values
+            imputer = Imputer(inputCols=self.schema.numerical_columns,  ## Imputer is the Imputation estimator for completing missing values, using the mean, median or mode
+                              outputCols=self.schema.im_numerical_columns)
+            stages.append(imputer)  ## in im_numerical_columns there will be no null values
+
+            ## Imputed one-hot features
             frequency_imputer = FrequencyImputer(inputCols=self.schema.one_hot_encoding_features,
                                                  outputCols=self.schema.im_one_hot_encoding_features)
             stages.append(frequency_imputer)
+
             for im_one_hot_feature, string_indexer_col in zip(self.schema.im_one_hot_encoding_features,
                                                               self.schema.string_indexer_one_hot_features):
-                string_indexer = StringIndexer(inputCol=im_one_hot_feature, outputCol=string_indexer_col)
+                string_indexer = StringIndexer(inputCol=im_one_hot_feature, outputCol=string_indexer_col) ##StringIndexer is A label indexer that maps a string column of labels to an ML column of label indices.
                 stages.append(string_indexer)
 
+            ## Applying the one-hot-encoding teachnique
             one_hot_encoder = OneHotEncoder(inputCols=self.schema.string_indexer_one_hot_features,
                                             outputCols=self.schema.tf_one_hot_encoding_features)
 
             stages.append(one_hot_encoder)
 
+            
             tokenizer = Tokenizer(inputCol=self.schema.tfidf_features[0], outputCol="words")
             stages.append(tokenizer)
 

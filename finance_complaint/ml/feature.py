@@ -66,7 +66,7 @@ class FrequencyEncoder(Estimator, HasInputCols, HasOutputCols,
                     groupby(f'g_{column}').
                     count().
                     withColumn(new_column, col('count')))
-            freq = freq.drop('count')
+            freq = freq.drop('count')  ##Returns a new DataFrame that drops the specified column
             logger.info(f"{column} has [{freq.count()}] unique category")
             replace_info.append(freq.collect())
 
@@ -92,14 +92,14 @@ class FrequencyEncoderModel(FrequencyEncoder, Transformer):
         for in_col, out_col, freq_info in zip(inputCols, outputCols, freqInfo):
             frequency_dataframe: DataFrame = spark_session.createDataFrame(freq_info)
 
-            columns = frequency_dataframe.columns
-            dataframe = dataframe.join(frequency_dataframe,
+            columns = frequency_dataframe.columns 
+            dataframe = dataframe.join(frequency_dataframe,    ## joining the dataframes
                                        on=dataframe[in_col] == frequency_dataframe[columns[0]])
 
             dataframe = dataframe.drop(columns[0])
             if out_col not in dataframe.columns:
-                dataframe = dataframe.withColumn(out_col, col(columns[1]))
-                dataframe = dataframe.drop(columns[1])
+                dataframe = dataframe.withColumn(out_col, col(columns[1]))  
+                dataframe = dataframe.drop(columns[1])  ## dropping the previous columns
         return dataframe
 
 
@@ -151,7 +151,7 @@ class FrequencyImputer(
     Estimator, HasInputCols, HasOutputCols,
     DefaultParamsReadable, DefaultParamsWritable):
     topCategorys = Param(Params._dummy(), "getTopCategorys", "getTopCategorys",
-                         typeConverter=TypeConverters.toListString)
+                         typeConverter=TypeConverters.toListString)  ## getting the most occuring elements in the column
 
     @keyword_only
     def __init__(self, inputCols: List[str] = None, outputCols: List[str] = None, ):
