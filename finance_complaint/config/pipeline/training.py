@@ -120,17 +120,17 @@ class FinanceConfig:
 
     def get_data_transformation_config(self) -> DataTransformationConfig:
         try:
-            data_transformation_dir = os.path.join(self.pipeline_config.artifact_dir,
+            data_transformation_dir = os.path.join(self.pipeline_config.artifact_dir,  ## making the directory for data transformation with timestamp
                                                    DATA_TRANSFORMATION_DIR, self.timestamp)
 
-            transformed_train_data_dir = os.path.join(
+            transformed_train_data_dir = os.path.join(   ## making the train data_directory inside the data_transformation_directory
                 data_transformation_dir, DATA_TRANSFORMATION_TRAIN_DIR
             )
-            transformed_test_data_dir = os.path.join(
+            transformed_test_data_dir = os.path.join(   ## making the test data_directory inside the data_transformation_directory
                 data_transformation_dir, DATA_TRANSFORMATION_TEST_DIR
             )
 
-            export_pipeline_dir = os.path.join(
+            export_pipeline_dir = os.path.join(     ## making the data transformed pipeline
                 data_transformation_dir, DATA_TRANSFORMATION_PIPELINE_DIR
             )
             data_transformation_config = DataTransformationConfig(
