@@ -133,7 +133,7 @@ class FinanceConfig:
             export_pipeline_dir = os.path.join(     ## making the data transformed pipeline
                 data_transformation_dir, DATA_TRANSFORMATION_PIPELINE_DIR
             )
-            data_transformation_config = DataTransformationConfig(
+            data_transformation_config = DataTransformationConfig( ## data transformation config preparation
                 export_pipeline_dir=export_pipeline_dir,
                 transformed_test_dir=transformed_test_data_dir,
                 transformed_train_dir=transformed_train_data_dir,

@@ -133,29 +133,31 @@ class DataTransformation():
     def initiate_data_transformation(self) -> DataTransformationArtifact:
         try:
             logger.info(f">>>>>>>>>>>Started data transformation <<<<<<<<<<<<<<<")
-            dataframe: DataFrame = self.read_data()
+            dataframe: DataFrame = self.read_data()  ## read data using spark
             # dataframe = self.get_balanced_shuffled_dataframe(dataframe=dataframe)
             logger.info(f"Number of row: [{dataframe.count()}] and column: [{len(dataframe.columns)}]")
 
-            test_size = self.data_tf_config.test_size
-            logger.info(f"Splitting dataset into train and test set using ration: {1 - test_size}:{test_size}")
-            train_dataframe, test_dataframe = dataframe.randomSplit([1 - test_size, test_size])
+            test_size = self.data_tf_config.test_size   ## getting the test-size
+            logger.info(f"Splitting dataset into train and test set using ration: {1 - test_size}:{test_size}") 
+            train_dataframe, test_dataframe = dataframe.randomSplit([1 - test_size, test_size]) ## splitting the train-test dataframe
             logger.info(f"Train dataset has number of row: [{train_dataframe.count()}] and"
-                        f" column: [{len(train_dataframe.columns)}]")
+                        f" column: [{len(train_dataframe.columns)}]") 
 
-            logger.info(f"Train dataset has number of row: [{train_dataframe.count()}] and"
-                        f" column: [{len(train_dataframe.columns)}]")
+            logger.info(f"Test dataset has number of row: [{test_dataframe.count()}] and"
+                        f" column: [{len(test_dataframe.columns)}]")   
 
-            pipeline = self.get_data_transformation_pipeline()
+            pipeline = self.get_data_transformation_pipeline()  ## getting the transformation_pipeline
 
-            transformed_pipeline = pipeline.fit(train_dataframe)
+            transformed_pipeline = pipeline.fit(train_dataframe)    ## trained the transformation pipeline
 
             # selecting required columns
             required_columns = [self.schema.scaled_vector_input_features, self.schema.target_column]
 
+            ## transforming the training dataset
             transformed_trained_dataframe = transformed_pipeline.transform(train_dataframe)
             transformed_trained_dataframe = transformed_trained_dataframe.select(required_columns)
 
+            ## transforming the test dataset
             transformed_test_dataframe = transformed_pipeline.transform(test_dataframe)
             transformed_test_dataframe = transformed_test_dataframe.select(required_columns)
 
@@ -182,7 +184,7 @@ class DataTransformation():
             print(transformed_test_dataframe.count(), len(transformed_trained_dataframe.columns))
             transformed_test_dataframe.write.parquet(transformed_test_data_file_path)
 
-            data_tf_artifact = DataTransformationArtifact(
+            data_tf_artifact = DataTransformationArtifact(   ## data_transformation_artifacts
                 transformed_train_file_path=transformed_train_data_file_path,
                 transformed_test_file_path=transformed_test_data_file_path,
                 exported_pipeline_file_path=export_pipeline_file_path,
