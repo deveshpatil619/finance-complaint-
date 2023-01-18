@@ -75,20 +75,25 @@ class DataTransformation():
 
             stages.append(one_hot_encoder)
 
-            
-            tokenizer = Tokenizer(inputCol=self.schema.tfidf_features[0], outputCol="words")
-            stages.append(tokenizer)
+            ## A tokenizer that converts the input string to lowercase and then splits it by white spaces.
+            tokenizer = Tokenizer(inputCol=self.schema.tfidf_features[0], outputCol="words")  ## we get words as output
+            stages.append(tokenizer) 
 
+            ## HashingTF Maps a sequence of terms to their term frequencies using the hashing trick
             hashing_tf = HashingTF(inputCol=tokenizer.getOutputCol(), outputCol="rawFeatures", numFeatures=40)
             stages.append(hashing_tf)
+
+            ## Compute the Inverse Document Frequency (IDF) given a collection of documents.
             idf = IDF(inputCol=hashing_tf.getOutputCol(), outputCol=self.schema.tf_tfidf_features[0])
             stages.append(idf)
-
-            vector_assembler = VectorAssembler(inputCols=self.schema.input_features,
+            
+            ## VectorAssembler is a feature transformer that merges multiple columns into a vector column.
+            vector_assembler = VectorAssembler(inputCols=self.schema.input_features,  ## 
                                                outputCol=self.schema.vector_assembler_output)
 
             stages.append(vector_assembler)
 
+            ## StandardScaler is that it will transform your data such that its distribution will have a mean value 0 and standard deviation of 1
             standard_scaler = StandardScaler(inputCol=self.schema.vector_assembler_output,
                                              outputCol=self.schema.scaled_vector_input_features)
             stages.append(standard_scaler)

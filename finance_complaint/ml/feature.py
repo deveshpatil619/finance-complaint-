@@ -13,7 +13,7 @@ from pyspark.sql.types import TimestampType, LongType
 from finance_complaint.logger import logger
 from finance_complaint.config.spark_manager import spark_session
 
-
+## when we need to implement the custom transformer in pyspark we need to implement FrequencyEncoder
 class FrequencyEncoder(Estimator, HasInputCols, HasOutputCols,
                        DefaultParamsReadable, DefaultParamsWritable):
     frequencyInfo = Param(Params._dummy(), "getfrequencyInfo", "getfrequencyInfo",
@@ -28,7 +28,7 @@ class FrequencyEncoder(Estimator, HasInputCols, HasOutputCols,
         self._setDefault(frequencyInfo="")
         # self._set(**kwargs)
 
-        self.setParams(**kwargs)
+        self.setParams(**kwargs)  ##returning the inputCols and outputCols in dictionary
 
     def setfrequencyInfo(self, frequencyInfo: list):
         return self._set(frequencyInfo=frequencyInfo)
@@ -53,7 +53,7 @@ class FrequencyEncoder(Estimator, HasInputCols, HasOutputCols,
         """
         return self._set(outputCols=value)
 
-    def _fit(self, dataframe: DataFrame):
+    def _fit(self, dataframe: DataFrame):  ##fit function will return the object of FrequencyEncoderModel class
         input_columns = self.getInputCols()
         print(f"Input columns: {input_columns}")
         output_columns = self.getOutputCols()
@@ -75,7 +75,7 @@ class FrequencyEncoder(Estimator, HasInputCols, HasOutputCols,
         estimator.setfrequencyInfo(frequencyInfo=replace_info)
         return estimator
 
-
+## when we need to implement the custom transformer in pyspark we need to implement FrequencyEncoderModel
 class FrequencyEncoderModel(FrequencyEncoder, Transformer):
 
     def __init__(self, inputCols: List[str] = None, outputCols: List[str] = None, ):
