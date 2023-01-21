@@ -124,6 +124,7 @@ class CloudEstimator(ABC):
 
 
 class S3Estimator(CloudEstimator):
+    """ This class will help us to load the model to s3_bucket, download model from s3_bucket and send model to s3 bucket"""
 
     def __init__(self, bucket_name, region_name="ap-south-1", **kwargs):
         """
@@ -144,9 +145,9 @@ class S3Estimator(CloudEstimator):
         # Output the bucket names
         print('Existing buckets:')
         available_buckets = [bucket['Name'] for bucket in response['Buckets']]
-        if bucket_name not in available_buckets:
+        if bucket_name not in available_buckets:  ## checking if our bucket is available in the s3 buckets
             location = {'LocationConstraint': region_name}
-            self.s3_client.create_bucket(Bucket=bucket_name,
+            self.s3_client.create_bucket(Bucket=bucket_name,  ## if bucket not available then create the bucket
                                          CreateBucketConfiguration=location)
         self.bucket = self.resource.Bucket(bucket_name)
         self.bucket_name = bucket_name
@@ -316,6 +317,7 @@ class S3Estimator(CloudEstimator):
 
 
 class FinanceComplaintEstimator:
+    """ This class will help us do th prediction using the local model"""
 
     def __init__(self, **kwargs):
         try:
@@ -357,6 +359,7 @@ class FinanceComplaintEstimator:
 
 
 class S3FinanceEstimator(FinanceComplaintEstimator, S3Estimator):
+    """Inheriting the features of both the classes FinanceComplaintEstimator and S3Estimator """
 
     def __init__(self, bucket_name, s3_key, region_name="ap-south-1"):
         super().__init__(bucket_name=bucket_name, region_name=region_name)

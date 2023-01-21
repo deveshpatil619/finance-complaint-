@@ -18,8 +18,8 @@ class ModelPusher:
     def push_model(self) -> str:
         try:
             model_registry = S3FinanceEstimator(bucket_name=self.model_pusher_config.bucket_name,s3_key=self.model_pusher_config.model_dir)
-            model_file_path = self.model_trainer_artifact.model_trainer_ref_artifact.trained_model_file_path
-            model_registry.save(model_dir=os.path.dirname(model_file_path),
+            model_file_path = self.model_trainer_artifact.model_trainer_ref_artifact.trained_model_file_path   ## trained_model_file_path location
+            model_registry.save(model_dir=os.path.dirname(model_file_path),  ## aving the model
                                 key=self.model_pusher_config.model_dir
                                 )
             # model = PipelineModel.load(self.model_trainer_artifact.model_trainer_ref_artifact.trained_model_file_path)

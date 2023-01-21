@@ -82,12 +82,12 @@ class ModelEvaluation:
                                         prediction_col=self.schema.prediction_column_name)
 
         logger.info(f"Trained_model_f1_score: {trained_model_f1_score}, Best model f1 score: {best_model_f1_score}")
-        changed_accuracy = trained_model_f1_score - best_model_f1_score
+        changed_accuracy = trained_model_f1_score - best_model_f1_score ## calculating the change in accuracy in our trained model vs the best model in bucket
 
-        if changed_accuracy >= self.model_eval_config.threshold:
-            is_model_accepted, is_active = True, True
+        if changed_accuracy >= self.model_eval_config.threshold:  ## comparing the changed accuracy with our threshold 
+            is_model_accepted, is_active = True, True  ## changing the status of the model and accepting it if the changed_accuracy is greater then the threshold
 
-        model_evaluation_artifact = ModelEvaluationArtifact(model_accepted=is_model_accepted,
+        model_evaluation_artifact = ModelEvaluationArtifact(model_accepted=is_model_accepted,  ## preparing the model_evaluation_artifacts
                                                             changed_accuracy=changed_accuracy,
                                                             trained_model_path=trained_model_file_path,
                                                             best_model_path=best_model_path,
