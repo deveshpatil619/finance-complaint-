@@ -16,8 +16,17 @@ class DataIngestionArtifact:
                      #              ["feature_store_file_path", "metadata_file_path", "download_dir"])
 
 
+@dataclass
+class DataValidationArtifact:
+    accepted_file_path:str
+    rejected_dir:str
 
-DataValidationArtifact = namedtuple("DataValidationArtifact", ["accepted_file_path", "rejected_dir"])
+    def to_dict(self):
+        return self.__dict__
+
+
+
+# DataValidationArtifact = namedtuple("DataValidationArtifact", ["accepted_file_path", "rejected_dir"])
 DataTransformationArtifact = namedtuple("DataTransformationArtifact",
                                         ["transformed_train_file_path", "exported_pipeline_file_path",
                                          "transformed_test_file_path",

@@ -16,7 +16,7 @@ class DataIngestionArtifactData:
         self.collection.find_one(query)
 
     def update_ingestion_artifact(self, query, data_ingestion_artifact: DataIngestionArtifact):
-        self.collection.update_one(query, model_eval_artifact.to_dict())
+        self.collection.update_one(query, data_ingestion_artifact.to_dict())
 
     def remove_ingestion_artifact(self, query):
         self.collection.delete_one(query)
