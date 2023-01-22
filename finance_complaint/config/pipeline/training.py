@@ -44,7 +44,7 @@ class FinanceConfig:
         except Exception as e:
             raise FinanceException(e, sys)
 
-    def get_data_ingestion_config(self, from_date=DATA_INGESTION_MIN_START_DATE, to_date=None) \
+    def get_data_ingestion_config(self, from_date=DATA_INGESTION_MIN_START_DATE, to_date="2022-12-31") \
             -> DataIngestionConfig:
 
         """
