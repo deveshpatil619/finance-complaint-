@@ -1,17 +1,18 @@
-version: "3"
+version: "3"   ##The file is written in version 3 of the Docker Compose file format.
 
 networks:
-  monitoring:
-    driver: bridge
+  monitoring:              ## network named "monitoring" with the driver "bridge".
+    driver: bridge                       ##  This allows the different services defined in the file to communicate with each other.
+
 
 volumes:
-  prometheus_data: {}
-  influxdb-storage: {}
+  prometheus_data: {}      ##  three volumes named "prometheus_data", "influxdb-storage", "grafana-storage". 
+  influxdb-storage: {}      ## These volumes are used to store data for the services that need them.
   grafana-storage: {}
 
 services:
-  application:
-    build: .
+  application:     ## The "application" service is built from the local Dockerfile and runs on port 8080. 
+    build: .        ## It also has environment variables that are passed to the container at runtime.
     #image: ${IMAGE_NAME}
     container_name: finance-complaint
     ports:
@@ -25,8 +26,8 @@ services:
       - "./airflow/logs:/app/airflow/logs"
       
   influxdb:
-    image: influxdb:1.7
-    container_name: influxdb
+    image: influxdb:1.7       ## The "influxdb" service is based on the "influxdb:1.7" image and runs on port 8086.
+    container_name: influxdb  ##  It also has an environment variable that specifies the database name.
     restart: always
     expose:
       - 8086
@@ -38,7 +39,10 @@ services:
       INFLUXDB_DB: actualdb
 
   grafana-server:
-    image: grafana/grafana-enterprise:latest
+    image: grafana/grafana-enterprise:latest    ## The "grafana-server" service is based on the "grafana/grafana-enterprise:latest" image and runs on port 3000.
+                                                ##  It has an environment variable that specifies a plugin to be installed.
+
+
     container_name: grafana-server
     restart: unless-stopped
     environment:
@@ -54,7 +58,8 @@ services:
       - grafana-storage:/var/lib/grafana
 
   node-exporter:
-    image: prom/node-exporter:latest
+    image: prom/node-exporter:latest  ## The "node-exporter" service is based on the "prom/node-exporter:latest" image and runs on port 9100. 
+                                      ## It exports system metrics such as CPU, memory, disk, and network usage from a machine.
     container_name: node-exporter
     restart: unless-stopped
     volumes:
@@ -73,8 +78,9 @@ services:
     networks:
       - monitoring
 
-  promtail:
-    image: grafana/promtail:2.6.1
+  promtail:                        
+    image: grafana/promtail:2.6.1    ## The "promtail" service is based on the "grafana/promtail:2.6.1" image and runs on port 9080. 
+                                    ## It allows to scrape logs and send them to Prometheus for long-term storage and analysis.
     container_name: promtail
     volumes:
       - /var/log:/var/log
@@ -86,7 +92,8 @@ services:
     networks:
       - monitoring
 
-  loki:
+  loki:                             ## The "loki" service is based on the "grafana/loki:2.6.1" image and runs on port 3101.
+                                    ##  It is an open-source log aggregation and querying system
     image: grafana/loki:2.6.1
     container_name: loki
     ports:
@@ -114,3 +121,14 @@ services:
       - "9091:9090"
     networks:
       - monitoring
+      ## The service is based on the "prom/prometheus:latest" image, which is the official Prometheus image.
+      ##The container is given the name "prometheus" for easier identification.
+      ##The service is set to restart automatically unless stopped, this ensures that the service is always running.
+      ##The service uses two volumes:
+      ##"./docker-compose-resource/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml", this volume mounts the local file "prometheus.yml" to the "/etc/prometheus" directory in the container.
+      ##"prometheus_data:/prometheus", this volume uses the volume named "prometheus_data" that was defined earlier in the file to store data for the prometheus service.
+      ##The command section specifies several command line options to configure Prometheus.
+      ##'--config.file=/etc/prometheus/prometheus.yml' specifies the location of the Prometheus configuration file.
+      ##'--storage.tsdb.path=/prometheus' specifies the directory for storing time series data.
+      ##'--web.console.libraries=/etc/prometheus/console_libraries' and '--web.console.templates=/etc/prometheus/consoles' specify the directories for storing Prometheus console libraries and templates.
+      ##'--web.enable-lifecycle' enables the Prometheus lifecycle feature, which allows for more fine-gr

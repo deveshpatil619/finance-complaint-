@@ -111,7 +111,7 @@ airflow db init
 
 To create login user for airflow
 ```
-airflow users create  -e avnish@ineuron.ai -f Avnish -l Yadav -p admin -r Admin  -u admin
+airflow users create  -e "email_id" -f "first_name" -l "last_name" -p "password" -r "role"  -u "username"
 ```
 To start scheduler
 ```
