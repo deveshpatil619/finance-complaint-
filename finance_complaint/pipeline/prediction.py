@@ -87,39 +87,39 @@ class PredictionPipeline:
 
     def start_batch_prediction(self):
         try:
-            input_dir = self.pipeline_config.input_dir
-            files= [input_dir]
+            input_dir = self.pipeline_config.input_dir  ## taking the input directory
+            files= [input_dir]  ##list of input directories
             logger.info(f"Files: {files}")
-            valid_files, invalid_files = self.get_valid_files(file_paths=files)
+            valid_files, invalid_files = self.get_valid_files(file_paths=files)  ## getting the valid and invalid files in list
             invalid_files = valid_files
             if len(invalid_files) > 0:
                 logger.info(f"{len(invalid_files)}: invalid file found:")
-                failed_dir = self.pipeline_config.failed_dir
+                failed_dir = self.pipeline_config.failed_dir ## saving the failed file in the failed_dir location
                 for invalid_file in invalid_files:
                     logger.info(f"Moving invalid file {invalid_file} to failed dir: {failed_dir}")
                     #self.s3_storage.move(source_key=invalid_file, destination_dir_key=failed_dir)
                     
 
-            if len(valid_files) == 0:
+            if len(valid_files) == 0:   ## no file will be there if the length of file is 0
                 logger.info(f"No valid file found.")
                 return None
 
             estimator = S3FinanceEstimator(bucket_name=S3_MODEL_BUCKET_NAME, s3_key=S3_MODEL_DIR_KEY)
             for valid_file in valid_files:
                 logger.info("Staring prediction of file: {valid_file}")
-                dataframe: DataFrame = self.read_file(valid_file)
-                #dataframe = dataframe.drop(self.schema.col_consumer_disputed)
-                transformed_dataframe = estimator.transform(dataframe=dataframe)
-                required_columns = self.schema.required_prediction_columns + [self.schema.prediction_label_column_name]
+                dataframe: DataFrame = self.read_file(valid_file)   # reading the valid_file and converting it to dataframe
+                #dataframe = dataframe.drop(self.schema.col_consumer_disputed)  ## dropping the target column
+                transformed_dataframe = estimator.transform(dataframe=dataframe)  ## making prediction
+                required_columns = self.schema.required_prediction_columns + [self.schema.prediction_label_column_name] 
                 logger.info(f"Saving required_columns: {required_columns}")
                 transformed_dataframe=transformed_dataframe.select(required_columns)
                 transformed_dataframe.show()
-                prediction_file_path = os.path.join(self.pipeline_config.prediction_dir, os.path.basename(valid_file))
-                logger.info(f"Writing prediction file at : [{self.pipeline_config.prediction_dir}] ")
-                self.write_file(dataframe=transformed_dataframe, file_path=prediction_file_path)
-                archive_file_path = os.path.join(self.pipeline_config.archive_dir, os.path.basename(valid_file))
+                prediction_file_path = os.path.join(self.pipeline_config.prediction_dir, os.path.basename(valid_file)) ## prediction file_path location
+                logger.info(f"Writing prediction file at : [{self.pipeline_config.prediction_dir}] ") 
+                self.write_file(dataframe=transformed_dataframe, file_path=prediction_file_path) ## writing the saved valid_file in parquet 
+                archive_file_path = os.path.join(self.pipeline_config.archive_dir, os.path.basename(valid_file)) ## archiving the predicted file at archive_file_path
                 logger.info(f"Arching valid input files at: [{archive_file_path}]")
-                self.write_file(dataframe=dataframe, file_path=archive_file_path)
+                self.write_file(dataframe=dataframe, file_path=archive_file_path)  ## writing the archived predicted file 
 
 
         except Exception as e:

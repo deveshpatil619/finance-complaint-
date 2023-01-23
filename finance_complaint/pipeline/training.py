@@ -9,6 +9,8 @@ from finance_complaint.entity.artifact_entity import DataIngestionArtifact, Data
 
 import sys
 
+## These training functions we will call in airflow to schedule our pipeline
+
 
 class TrainingPipeline:
 
