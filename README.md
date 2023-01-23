@@ -96,7 +96,7 @@ AIRFLOW SETUP
 
 Set airflow directory
 ```
-export AIRFLOW_HOME="/home/avnish/census_consumer_project/census_consumer_complaint/airflow"
+export AIRFLOW_HOME="/config/workspace/airflow"
 ```
 
 To install airflow 
