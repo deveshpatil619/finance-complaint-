@@ -62,6 +62,12 @@ class ModelTrainer:
         try:
             stages = []
             logger.info("Creating Random Forest Classifier class.")
+
+            """ This code is creating an instance of the RandomForestClassifier class from the pyspark.ml.classification module. This classifier is a machine learning algorithm that can be used for classification problems.
+The RandomForestClassifier class takes several parameters, which are used to configure the classifier. The two parameters being passed in this code are:
+labelCol: This parameter is used to specify the column name of the label (target variable) in the input DataFrame. In this case, the label column is specified as self.schema.target_indexed_label, where self.schema is an object that holds the schema of the DataFrame and target_indexed_label is the column name of the label.
+featuresCol: This parameter is used to specify the column name of the features in the input DataFrame. In this case, the feature column is specified as self.schema.scaled_vector_input_features, where self.schema is an object that holds the schema of the DataFrame and scaled_vector_input_features is the column name of the feature.
+Once the classifier is created, it can be trained on a dataset using the fit() method and used to make predictions on new data using the transform() method."""
             random_forest_clf = RandomForestClassifier(labelCol=self.schema.target_indexed_label,
                                                        featuresCol=self.schema.scaled_vector_input_features)
 

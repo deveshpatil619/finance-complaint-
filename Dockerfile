@@ -46,7 +46,6 @@ CMD ["start.sh"]
 
 ## The fourth command RUN chmod 777 start.sh is used to change the permissions of the file start.sh to 777 (read, write, execute permissions for all users) so that it can be executed when the container starts.
 
-
 ##The ENTRYPOINT instruction is used to configure the container to run as an executable.
 
 ##The CMD instruction is used to run a command when the container starts. In this case, it runs a script called "start.sh".
