@@ -1,4 +1,11 @@
+##This is a CircleCI configuration file, written in YAML. It defines several jobs and a workflow for a continuous integration and continuous deployment (CICD) pipeline.
+##The file has three jobs: "continuous-integration", "continuous-delivery", and "continuous-deployment". Each job runs a set of steps, which are executed in order.
+
 version: 2.1
+
+## The "continuous-integration" job starts by checking out the code from the repository and then runs two steps:
+##"lint code" step, which runs a command to lint the code.
+##"run unit tests" step, which runs a command to run the unit tests.
 
 jobs:
   continuous-integration:
@@ -16,6 +23,8 @@ jobs:
           name: run unit tests
           command: echo "Running unit tests"
   
+  ## The "continuous-delivery" job starts by checking out the code from the repository and then runs several steps:
+  ##
   continuous-delivery:
     docker:
       - image: google/cloud-sdk
@@ -24,6 +33,7 @@ jobs:
       REPOSITORY: finance-complaint
       IMAGE_NAME: finance-complaint
       IMAGE_TAG: latest
+## "google cloud authentication" step, which authenticates with the Google Cloud service and sets the project and compute zone.
     steps:
       - checkout
       - run:
@@ -32,26 +42,29 @@ jobs:
             echo $GCLOUD_SERVICE_KEY | gcloud auth activate-service-account --key-file=-
             gcloud --quiet config set project ${GOOGLE_PROJECT_ID}
             gcloud --quiet config set compute/zone ${GOOGLE_COMPUTE_ZONE}
-
+## "setup_remote_docker" step, which sets up a remote Docker environment for building and pushing the image
       - setup_remote_docker:
           version: 20.10.14
           docker_layer_caching: true
-
+## "build and tag" step, which builds a Docker image and tags it with the IMAGE_NAME, REPOSITORY and IMAGE_TAG environment variables.
       - run:
           name: build and tag
           command: docker build -t $GOOGLE_COMPUTE_ZONE-docker.pkg.dev/${GOOGLE_PROJECT_ID}/$REPOSITORY/$IMAGE_NAME:$IMAGE_TAG .
 
+## "configure docker login" step, which configures the login to the Google Cloud Package Registry
       - run: 
           name: configure docker login
           command: gcloud auth configure-docker $GOOGLE_COMPUTE_ZONE-docker.pkg.dev
-      
+## "push to private repository" step, which pushes the built image to the private repository
       - run:
           name: push to private repository
           command: docker push $GOOGLE_COMPUTE_ZONE-docker.pkg.dev/${GOOGLE_PROJECT_ID}/$REPOSITORY/$IMAGE_NAME:$IMAGE_TAG 
 
+## The "continuous-deployment" job starts by checking out the code from the repository and then runs several steps:
+
   continuous-deployment:
     machine: true
-    resource_class: machine-learning-01/self-hosted-1
+    resource_class: deveshpatil619/self-hosted-1
     environment:
       REPOSITORY: finance-complaint
       GAR_IMAGE_NAME: finance-complaint
@@ -62,44 +75,49 @@ jobs:
       MONGO_DB_URL: ${MONGO_DB_URL}
     steps:
       - checkout
-
+## "google cloud authentication" step, which authenticates with the Google Cloud service and sets the project and compute zone.
       - run:
           name: google cloud authentication
           command: |
             echo $GCLOUD_SERVICE_KEY | gcloud auth activate-service-account --key-file=-
             gcloud --quiet config set project ${GOOGLE_PROJECT_ID}
             gcloud --quiet config set compute/zone ${GOOGLE_COMPUTE_ZONE}
-
+## "configure docker login" step, which configures the login to the Google Cloud Package Registry
       - run: 
           name: configure docker login
           command: gcloud auth configure-docker $GOOGLE_COMPUTE_ZONE-docker.pkg.dev
 
+## "pull image from private repository" step, which pulls the built image from the private repository
       - run:
           name: pull image from private repository
           command: docker pull ${GOOGLE_COMPUTE_ZONE}-docker.pkg.dev/${GOOGLE_PROJECT_ID}/$REPOSITORY/$GAR_IMAGE_NAME:$IMAGE_TAG 
-        
+
+ ## "Set env variable" step, which sets the environment variable for the image name       
       - run: 
           name: Set env variable
           command: echo 'export IMAGE_NAME="${GOOGLE_COMPUTE_ZONE}-docker.pkg.dev/${GOOGLE_PROJECT_ID}/$REPOSITORY/finance-complaint:$IMAGE_TAG"' >> "$BASH_ENV"
 
+## "start the containers" step, which starts the container using the image and the environment variables
       - run:
           name: start the containers
           command: docker-compose up -d
-  
+
+## Finally, the "CICD" workflow is defined, which orchestrates the three jobs, with each job being dependent on the previous one.  
 workflows:
   CICD:
+## "continuous-integration" job is the first job and it runs independently
     jobs:
       - continuous-integration
-
+## "continuous-delivery" job runs after the "continuous-integration" job is completed successfully
       - continuous-delivery:
           requires:
             - continuous-integration
-
+## "sanity-check" job is an approval job, which requires a manual approval before proceeding to the next step.
       - sanity-check:
           type: approval
           requires:
           - continuous-delivery
-
+## "continuous-deployment" job runs after the "sanity-check" job is approved and the "continuous-integration" and "continuous-delivery" jobs are completed successfully.
       - continuous-deployment:
           requires:
             - sanity-check
