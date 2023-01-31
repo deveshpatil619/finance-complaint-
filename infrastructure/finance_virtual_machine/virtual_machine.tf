@@ -1,3 +1,5 @@
+
+
 resource "google_compute_instance" "finance_compute_instance" {
   name         = var.finance_compute_instance_name
   machine_type = var.finance_compute_instance_compute_type
@@ -27,4 +29,9 @@ resource "google_compute_instance" "finance_compute_instance" {
     google_compute_firewall.finance_compute_firewall
   ]
 }
+
+
+
+
+
 
