@@ -8,10 +8,13 @@ version: 2.1
 ##"run unit tests" step, which runs a command to run the unit tests.
 
 jobs:
+##  job named "continuous-integration" that is run inside a Docker container using the image "cimg/base:stable",
+## and is assigned the "medium" resource class.
   continuous-integration:
     docker:
       - image: cimg/base:stable
     resource_class: medium
+##"checkout" is a built-in step that retrieves the code from the repository specified in the CircleCI project settings.
     steps:
       - checkout
 
@@ -24,7 +27,7 @@ jobs:
           command: echo "Running unit tests"
   
   ## The "continuous-delivery" job starts by checking out the code from the repository and then runs several steps:
-  ##
+  ##"checkout" is a built-in step that retrieves the code from the repository specified in the CircleCI project settings.
   continuous-delivery:
     docker:
       - image: google/cloud-sdk
