@@ -1,29 +1,31 @@
+# This is a CircleCI configuration file for a Terraform workflow. The version field specifies the version 
+# of the CircleCI configuration file format, which is 2.1 in this case.
 version: 2.1
 
-jobs:
-  init:
+jobs: ## The jobs section defines three jobs, each with its own Docker image: init, format, and plan.
+  init: ## The init job contains two steps.  
     docker:
       - image: docker.mirror.hashicorp.services/hashicorp/terraform:light
-    steps:
+    steps:   ## The first step, checkout, retrieves the source code from the repository.
       - checkout
-      - run:
+      - run:  ## The second step, run, initializes Terraform in the infrastructure/ directory.
           name: Initialise Terraform
           command: |
             terraform -chdir==infrastructure/ init
     
-  format:
-    docker:
+  format: ## The format job has two steps. 
+    docker: 
       - image: docker.mirror.hashicorp.services/hashicorp/terraform:light
     steps:
-      - attach_workspace:
+      - attach_workspace: ## The first step, attach_workspace, attaches the workspace to the current working directory.
           at: .
-      - run:
+      - run: ##  The second step, run, formats Terraform files in the infrastructure/ directory using the fmt -recursive command.
           name: Format Terraform Files
           command: |
             terraform -chdir=infrastructure/ fmt -recursive
 
-  plan:
-    docker:
+  plan: ##The plan job has one step, run, which plans the infrastructure using the Terraform plan command in the infrastructure/ directory.
+    docker:  
       - image: docker.mirror.hashicorp.services/hashicorp/terraform:light
     steps:
       - run:
@@ -40,10 +42,10 @@ jobs:
   #         command: |
             # terraform -chdir=infrastructure/ apply -auto-approve 
             
-workflows:
+workflows: ##The workflows section specifies the workflow for the Terraform plan-approve-apply process.
   version: 2.1
-  plan_approve_apply:
-    jobs:
+  plan_approve_apply: ##  The plan_approve_apply workflow consists of four jobs: 
+    jobs:  ## checkout, init, fmt, and plan, with dependencies specified using the requires field.
       - checkout
       - init:
           requires:
@@ -54,8 +56,8 @@ workflows:
       - plan:
           requires:
             - fmt
-      - wait-for-approval:
-          type: approval
+      - wait-for-approval: ## The last step, wait-for-approval, is a type of approval step that waits 
+          type: approval  ## for manual approval before continuing to the next step in the workflow.
           requires:
             - plan
       # - apply:

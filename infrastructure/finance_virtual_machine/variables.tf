@@ -83,8 +83,10 @@ variable "finance_compute_instance_zone" { ## finance_compute_instance_zone: Thi
   default = "us-central1-a"
 }
 
-variable "finance_compute_instance_base_image" { ## finance_compute_instance_base_image: This variable is a string type and its default value is "ubuntu-os-cloud/ubuntu-2004-lts".
-  type    = string
+variable "finance_compute_instance_base_image" { ## This variable is a string type and its default value is "ubuntu-os-cloud/ubuntu-2004-lts".
+  type    = string    ## The value "ubuntu-os-cloud/ubuntu-2004-lts" is a reference to an image in the Google Cloud Platform. 
+                      ## It is the identifier for an Ubuntu 20.04 LTS (Long-Term Support) image stored in the ubuntu-os-cloud project.
+                      ## The use of this image likely refers to using it as a base operating system image for a compute instance in the Google Cloud Platform.
   default = "ubuntu-os-cloud/ubuntu-2004-lts"
 }
 

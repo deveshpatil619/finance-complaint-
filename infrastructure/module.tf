@@ -23,3 +23,10 @@ module "finance_model_bucket" {
 module "finance_virtual_machine" {
   source = "./finance_virtual_machine"
 }
+
+
+
+
+
+
+
