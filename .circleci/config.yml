@@ -1,11 +1,11 @@
-##This is a CircleCI configuration file, written in YAML. It defines several jobs and a workflow for a continuous integration and continuous deployment (CICD) pipeline.
-##The file has three jobs: "continuous-integration", "continuous-delivery", and "continuous-deployment". Each job runs a set of steps, which are executed in order.
+##This is a CircleCI configuration file, written in YAML. It defines several jobs and a workflow for a continuous
+# integration and continuous deployment (CICD) pipeline.The file has three jobs: "continuous-integration", 
+#"continuous-delivery", and "continuous-deployment". Each job runs a set of steps, which are executed in order.
 
 version: 2.1
 
 ## The "continuous-integration" job starts by checking out the code from the repository and then runs two steps:
-##"lint code" step, which runs a command to lint the code.
-##"run unit tests" step, which runs a command to run the unit tests.
+
 
 jobs:
 ##  job named "continuous-integration" that is run inside a Docker container using the image "cimg/base:stable",
@@ -19,11 +19,11 @@ jobs:
       - checkout
 
       - run: 
-          name: lint code
+          name: lint code  ##"lint code" step, which runs a command to lint the code.
           command: echo "Linting repository"
 
       - run: 
-          name: run unit tests
+          name: run unit tests  ##"run unit tests" step, which runs a command to run the unit tests.
           command: echo "Running unit tests"
   
   ## The "continuous-delivery" job starts by checking out the code from the repository and then runs several steps:
@@ -120,9 +120,12 @@ workflows:
           type: approval
           requires:
           - continuous-delivery
-## "continuous-deployment" job runs after the "sanity-check" job is approved and the "continuous-integration" and "continuous-delivery" jobs are completed successfully.
+## "continuous-deployment" job runs after the "sanity-check" job is approved and the "continuous-integration" 
+#and "continuous-delivery" jobs are completed successfully.
       - continuous-deployment:
           requires:
             - sanity-check
             - continuous-integration
             - continuous-delivery
+
+
